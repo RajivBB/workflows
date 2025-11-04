@@ -7,6 +7,23 @@ on:
 jobs:
   coderabbit:
     runs-on: ubuntu-latest
+    run: |
+      cat <<EOF > .coderabbit.yaml
+      reviews:
+        auto_review:
+          branches:
+            - main
+            - develop
+            - feature/**
+            - feat/**
+            - fix/**
+            - fixes/**
+            - hotfix/**
+            - refactor/**
+            - enhance/**
+            - test/**
+        review_status: false
+      EOF
     name: CodeRabbit AI Review
     steps:
       - uses: actions/checkout@v4
