@@ -1,0 +1,20 @@
+name: Notify
+
+on:
+  workflow_call:
+    secrets:
+      GOOGLE_CHAT_WEBHOOK:
+        required: true
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    name: Notify
+    steps:
+      - name: Google Chat Notification
+        uses: Co-qn/google-chat-notification@releases/v1
+        with:
+          name: Job by ${{ github.actor }}
+          url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+          status: ${{ job.status }}
+          # if: always()

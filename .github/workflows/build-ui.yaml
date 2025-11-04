@@ -1,0 +1,31 @@
+name: Build and Push
+
+on:
+  workflow_call:
+    secrets:
+      REGISTRY_URL:
+        required: true
+      GCR_CRED:
+        required: true
+      ACCESS_TOKEN:
+        required: true
+
+jobs:
+  ecr-build-push:
+    runs-on: ubuntu-latest
+    name: Build and Push
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to docker
+        run: |
+          docker login -u ${{secrets.REGISTRY_USER}} -p "${{secrets.REGISTRY_PASSWORD}}" ${{secrets.REGISTRY_HOST}}
+      - name: Build and Push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha
+          tags: ${{secrets.REGISTRY_URL}}/${{github.event.repository.name}}:${{github.sha}}

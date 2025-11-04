@@ -1,0 +1,35 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      k8s-namespace:
+        required: false
+        type: string
+        default: "default"
+        description: "Namespace to deploy"
+      k8s-deployment:
+        required: true
+        type: string
+        description: "Deployment name"
+      k8s-container:
+        required: true
+        type: string
+        description: "Container name"
+    secrets:
+      REGISTRY_URL:
+        required: true
+      KUBECONFIG:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - uses: actions-hub/kubectl@master
+        name: Deploy
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBECONFIG }}
+        with:
+          args: set image deployment/${{inputs.k8s-deployment}} ${{inputs.k8s-container}}=${{secrets.REGISTRY_URL}}/${{github.event.repository.name}}:${{ github.sha }} -n ${{inputs.k8s-namespace}}

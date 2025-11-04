@@ -1,0 +1,20 @@
+name: Test
+on:
+  workflow_call:
+    secrets:
+      ACCESS_TOKEN:
+        required: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Lint
+        run: |
+          echo "${{ secrets.ACCESS_TOKEN }}" > .id_rsa
+          export DOCKER_BUILDKIT=1 && eval `ssh-agent`
+          chmod 400 .id_rsa && ssh-add .id_rsa
+          docker build . --ssh default --target test

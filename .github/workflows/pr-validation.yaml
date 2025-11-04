@@ -1,0 +1,16 @@
+
+name: CodeRabbit AI Review
+
+on:
+  workflow_call:
+
+jobs:
+  coderabbit:
+    runs-on: ubuntu-latest
+    name: CodeRabbit AI Review
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run CodeRabbit AI review
+        uses: coderabbitai/coderabbit-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
