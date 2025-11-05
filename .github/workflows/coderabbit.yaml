@@ -1,23 +1,53 @@
-name: CodeRabbit AI Review
+name: CodeRabbit Configuration Setup
 
 on:
   workflow_call:
 
 jobs:
-  coderabbit:
+  setup-coderabbit-config:
     runs-on: ubuntu-latest
-    name: CodeRabbit AI Review
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Check if .coderabbit.yaml exists
+        id: check-config
+        run: |
+          if [ -f .coderabbit.yaml ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "✅ CodeRabbit configuration already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ CodeRabbit configuration not found"
+          fi
       
       - name: Create CodeRabbit Configuration
+        if: steps.check-config.outputs.exists == 'false'
         run: |
-          cat <<EOF > .coderabbit.yaml
+          cat > .coderabbit.yaml << 'EOF'
+          language: en-US
+          early_access: false
           reviews:
+            profile: chill
+            request_changes_workflow: false
+            high_level_summary: true
+            poem: false
+            review_status: false
+            collapse_walkthrough: false
             auto_review:
-              branches:
+              enabled: true
+              drafts: false
+              base_branches:
                 - main
                 - develop
+                - master
                 - feature/**
                 - feat/**
                 - fix/**
@@ -26,10 +56,23 @@ jobs:
                 - refactor/**
                 - enhance/**
                 - test/**
-            review_status: false
+          chat:
+            auto_reply: true
           EOF
+          
+          echo "✅ Created .coderabbit.yaml configuration"
       
-      - name: Run CodeRabbit AI review
-        uses: coderabbitai/coderabbit-action@v1
-        with:
-          github_token: ${{ secrets.TOKEN }}
+      - name: Commit configuration to PR branch
+        if: steps.check-config.outputs.exists == 'false'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .coderabbit.yaml
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: add coderabbit configuration [skip ci]"
+            git push
+            echo "✅ CodeRabbit configuration committed and pushed"
+          fi
