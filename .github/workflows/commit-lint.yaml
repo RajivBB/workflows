@@ -77,3 +77,5 @@ jobs:
               
               Please update your commit messages and force push to update the PR.`
             })
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
