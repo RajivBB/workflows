@@ -1,5 +1,4 @@
 name: CodeRabbit Configuration Setup
-
 on:
   workflow_call:
 
@@ -13,20 +12,20 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Check if .coderabbit.yaml exists
-        id: check-config
+        id: check_config
         run: |
           if [ -f .coderabbit.yaml ]; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "✅ CodeRabbit configuration already exists"
+            echo "CodeRabbit configuration already exists"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
-            echo "⚠️ CodeRabbit configuration not found"
+            echo "CodeRabbit configuration not found"
           fi
-      
+
       - name: Create CodeRabbit Configuration
-        if: steps.check-config.outputs.exists == 'false'
+        if: steps.check_config.outputs.exists == 'false'
         run: |
           cat > .coderabbit.yaml << 'EOF'
           language: en-US
@@ -42,25 +41,24 @@ jobs:
               enabled: true
               drafts: false
               base_branches:
-                - main
-                - develop
-                - master
-                - feature/**
-                - feat/**
-                - fix/**
-                - fixes/**
-                - hotfix/**
-                - refactor/**
-                - enhance/**
-                - test/**
+                - "^main$"
+                - "^develop$"
+                - "^master$"
+                - "^feature/.*$"
+                - "^feat/.*$"
+                - "^fix/.*$"
+                - "^fixes/.*$"
+                - "^hotfix/.*$"
+                - "^refactor/.*$"
+                - "^enhance/.*$"
+                - "^test/.*$"
           chat:
             auto_reply: true
           EOF
-          
-          echo "✅ Created .coderabbit.yaml configuration"
-      
+          echo "Created .coderabbit.yaml configuration"
+
       - name: Commit configuration to PR branch
-        if: steps.check-config.outputs.exists == 'false'
+        if: steps.check_config.outputs.exists == 'false'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -70,6 +68,5 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore: add coderabbit configuration [skip ci]"
-            git push
-            echo "✅ CodeRabbit configuration committed and pushed"
-          fi
+            git push origin HEAD:${{ github.head_ref }}
+            echo "CodeRabbit configuration committed and pushed"
