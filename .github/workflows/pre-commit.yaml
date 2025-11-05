@@ -23,5 +23,17 @@ jobs:
       - name: Validate PR title (commitlint)
         if: github.event_name == 'pull_request'
         run: |
-          npm install -g @commitlint/cli @commitlint/config-conventional
-          echo "${{ github.event.pull_request.title }}" | commitlint
+          npm install --save-dev @commitlint/cli @commitlint/config-conventional
+          echo 'module.exports = {
+            extends: ["@commitlint/config-conventional"],
+            rules: {
+              "type-enum": [2, "always", ["feat","fix","docs","style","refactor","perf","test","chore","ci","build","revert"]],
+              "type-case": [2, "always", "lower-case"],
+              "type-empty": [2, "never"],
+              "subject-empty": [2, "never"],
+              "subject-case": [2, "never", ["upper-case"]],
+              "subject-full-stop": [2, "never", "."],
+              "header-max-length": [2, "always", 72]
+            }
+          }' > commitlint.config.js
+          echo "${{ github.event.pull_request.title }}" | npx commitlint --config commitlint.config.js
