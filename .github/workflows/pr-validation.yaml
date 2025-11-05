@@ -1,37 +1,32 @@
+
 name: CodeRabbit AI Review
 
 on:
   workflow_call:
-    secrets:
-      TOKEN:
-        required: true
 
 jobs:
   coderabbit:
     runs-on: ubuntu-latest
+    run: |
+      cat <<EOF > .coderabbit.yaml
+      reviews:
+        auto_review:
+          branches:
+            - main
+            - develop
+            - feature/**
+            - feat/**
+            - fix/**
+            - fixes/**
+            - hotfix/**
+            - refactor/**
+            - enhance/**
+            - test/**
+        review_status: false
+      EOF
     name: CodeRabbit AI Review
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Create CodeRabbit Configuration
-        run: |
-          cat <<EOF > .coderabbit.yaml
-          reviews:
-            auto_review:
-              branches:
-                - main
-                - develop
-                - feature/**
-                - feat/**
-                - fix/**
-                - fixes/**
-                - hotfix/**
-                - refactor/**
-                - enhance/**
-                - test/**
-            review_status: false
-          EOF
-      
       - name: Run CodeRabbit AI review
         uses: coderabbitai/coderabbit-action@v1
         with:
