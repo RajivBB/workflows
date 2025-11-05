@@ -61,3 +61,5 @@ jobs:
             git commit -m "chore: add coderabbit configuration [skip ci]"
             git push origin HEAD:${{ github.head_ref }}
             echo "CodeRabbit configuration committed and pushed"
+          fi
+          
