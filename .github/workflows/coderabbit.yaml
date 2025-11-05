@@ -6,9 +6,6 @@ on:
 jobs:
   setup-coderabbit-config:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
