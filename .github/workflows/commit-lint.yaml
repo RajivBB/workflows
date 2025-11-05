@@ -1,13 +1,9 @@
-name: Commit Message Validation
-
-on:
-  workflow_call:
-
 jobs:
   validate-commits:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write  # Give permission to write comments
     steps:
-      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
         with:
