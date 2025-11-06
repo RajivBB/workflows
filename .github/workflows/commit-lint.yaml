@@ -67,6 +67,6 @@ jobs:
             **Allowed types:** feat, fix, docs, style, refactor, perf, test, chore, ci, build, revert
             **Example of a valid commit message:**
             \`feat(auth): add JWT token validation\`
-            \`fix(api): handle null response correctly\`
+            \`fix: handle null response correctly\`
             Please update your commit messages accordingly and push your changes.`
             })
