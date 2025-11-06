@@ -1,6 +1,15 @@
 name: CodeRabbit Configuration Setup
+
 on:
   workflow_call:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: coderabbit-setup-${{ github.head_ref }}
+  cancel-in-progress: false
 
 jobs:
   setup-coderabbit-config:
@@ -18,10 +27,10 @@ jobs:
         run: |
           if [ -f .coderabbit.yaml ]; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "CodeRabbit configuration already exists"
+            echo "✅ CodeRabbit configuration already exists"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
-            echo "CodeRabbit configuration not found"
+            echo "📝 CodeRabbit configuration not found - will create"
           fi
 
       - name: Create CodeRabbit Configuration
@@ -43,28 +52,9 @@ jobs:
               base_branches:
                 - "^main$"
                 - "^develop$"
-              pr_size_limit: 20
-              time_window: "10m"
-            review_types:
-              - security
-              - performance
-              - best-practices
-              - accessibility  
-            max_lines: 500  
-            ignore_paths:  
-              - "node_modules/"
-              - "dist/"
-              - "*.lock"  
-            custom_rules:  
-              enforce-conventional-commits: true  
-              no-unused-vars: true
 
           chat:
             auto_reply: true
-            max_replies: 3  
-            contexts:  
-              - "CONTRIBUTING.md" 
-              - ".github/workflows/commitlint.yml"
           EOF
           echo "Created .coderabbit.yaml configuration"
 
@@ -76,10 +66,15 @@ jobs:
           git add .coderabbit.yaml
 
           if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "chore: add coderabbit configuration [skip ci]"
-            git push origin HEAD:${{ github.head_ref }}
-            echo "CodeRabbit configuration committed and pushed"
+            echo "ℹ️ No changes to commit"
+            exit 0
           fi
+
+          git commit -m "chore: add coderabbit configuration [skip ci]"
           
+          if git push origin HEAD:${{ github.head_ref }}; then
+            echo "✅ CodeRabbit configuration committed and pushed"
+          else
+            echo "❌ Failed to push changes. Check branch protection rules."
+            exit 1
+          fi
