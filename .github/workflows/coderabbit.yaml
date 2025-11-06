@@ -29,13 +29,13 @@ jobs:
         run: |
           cat > .coderabbit.yaml << 'EOF'
           language: en-US
-          early_access: false
+          early_access: false 
           reviews:
-            profile: chill
-            request_changes_workflow: false
+            profile: professional 
+            request_changes_workflow: true  
             high_level_summary: true
             poem: false
-            review_status: false
+            review_status: true  
             collapse_walkthrough: false
             auto_review:
               enabled: true
@@ -43,8 +43,28 @@ jobs:
               base_branches:
                 - "^main$"
                 - "^develop$"
+              pr_size_limit: 20
+              time_window: "10m"
+            review_types:
+              - security
+              - performance
+              - best-practices
+              - accessibility  
+            max_lines: 500  
+            ignore_paths:  
+              - "node_modules/"
+              - "dist/"
+              - "*.lock"  
+            custom_rules:  
+              enforce-conventional-commits: true  
+              no-unused-vars: true
+
           chat:
             auto_reply: true
+            max_replies: 3  
+            contexts:  
+              - "CONTRIBUTING.md" 
+              - ".github/workflows/commitlint.yml"
           EOF
           echo "Created .coderabbit.yaml configuration"
 
