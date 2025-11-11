@@ -37,10 +37,9 @@ jobs:
           echo 'Building image...'
           docker build . \
             --ssh default=$SSH_AUTH_SOCK \
-            -t ${{ secrets.REGISTRY_URL }}/${{ secrets.REGISTRY_USER }}:${{ github.sha }}
+            -t ${{ secrets.REGISTRY_URL }}/${{github.event.repository.name}}:${{github.sha}}
 
           echo 'Pushing image...'
-          docker push ${{ secrets.REGISTRY_URL }}/${{secrets.REGISTRY_USER}}:${{ github.sha }}
-
+          docker push ${{ secrets.REGISTRY_URL }}/${{github.event.repository.name}}:${{ github.sha }}
 
           echo 'Done!'
