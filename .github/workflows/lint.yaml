@@ -12,9 +12,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      
+      - name: Start SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
       - name: Lint
+        env:
+          DOCKER_BUILDKIT: 1
         run: |
-          echo "${{ secrets.ACCESS_TOKEN }}" > .id_rsa
-          export DOCKER_BUILDKIT=1 && eval `ssh-agent`
-          chmod 400 .id_rsa && ssh-add .id_rsa
-          docker build . --ssh default --target lint
+          docker build . --ssh default=$SSH_AUTH_SOCK --target lint
