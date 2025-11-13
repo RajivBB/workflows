@@ -17,7 +17,7 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.ACCESS_TOKEN }}
-
+          log-public-key: false
       - name: Lint
         env:
           DOCKER_BUILDKIT: 1
